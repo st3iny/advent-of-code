@@ -14,32 +14,33 @@ fn input() -> String {
 }
 
 fn part1(input: &str) -> i32 {
-    let mut score = 0;
-    for line in input.split_terminator('\n') {
-        let round = line.split_once(' ').expect("Invalid line format");
-        score += match round {
-            // Draw
-            ("A", "X") => 3,
-            ("B", "Y") => 3,
-            ("C", "Z") => 3,
+    input
+        .split_terminator('\n')
+        .map(|line| {
+            let round = line.split_once(' ').expect("Invalid line format");
+            let mut score = match round {
+                // Draw
+                ("A", "X") => 3,
+                ("B", "Y") => 3,
+                ("C", "Z") => 3,
 
-            // Win
-            ("A", "Y") => 6,
-            ("B", "Z") => 6,
-            ("C", "X") => 6,
+                // Win
+                ("A", "Y") => 6,
+                ("B", "Z") => 6,
+                ("C", "X") => 6,
 
-            // Lose
-            _ => 0,
-        };
-        score += match round.1 {
-            "X" => 1,
-            "Y" => 2,
-            "Z" => 3,
-            _ => unreachable!("Invalid action"),
-        }
-    }
-
-    score
+                // Lose
+                _ => 0,
+            };
+            score += match round.1 {
+                "X" => 1,
+                "Y" => 2,
+                "Z" => 3,
+                _ => unreachable!("Invalid action"),
+            };
+            score
+        })
+        .sum()
 }
 
 #[cfg(test)]
