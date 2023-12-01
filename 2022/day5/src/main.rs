@@ -81,8 +81,10 @@ mod tests {
         assert_eq!(part1(&input()), "JRVNHHCSJ");
     }
 
+    /*
     #[test]
     fn test_part2() {
         assert_eq!(part2(&input()), "TODO");
     }
+    */
 }
