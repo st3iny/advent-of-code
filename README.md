@@ -1,3 +1,3 @@
-# Advent of Code 2022
+# Advent of Code
 
-My solutions to challenges from [Advent of Code 2022](https://adventofcode.com/2022).
+My solutions to the yearly [Advent of Code](https://adventofcode.com) challenge.
