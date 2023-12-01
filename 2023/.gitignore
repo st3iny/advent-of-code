@@ -1,0 +1,4 @@
+/.project.gf
+/day*/part*
+!/day*/part*.c
+!/day*/part*.solution.txt
