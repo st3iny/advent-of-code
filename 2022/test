@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for day in day*; do
+    ( cd "$day" && cargo test ) || exit 1
+done
