@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 int main() {
     int acc = 0;
@@ -11,27 +10,27 @@ int main() {
         printf("%s", line);
 
         char* iter = line;
-        char first = 0, second = 0;
+        int first = -1, second = -1;
         for (char* iter = line; *iter != 0; iter += sizeof(char)) {
             char c = *iter;
             if (c >= '0' && c <= '9') {
-                if (first == 0) {
-                    first = c;
+                const int num = c - '0';
+                if (first == -1) {
+                    first = num;
                 } else {
-                    second = c;
+                    second = num;
                 }
             }
         }
 
-        assert(first != 0);
+        assert(first != -1);
 
-        if (second == 0) {
+        if (second == -1) {
             second = first;
         }
 
-        char lit[] = {first, second, 0};
-        printf("%s\n", lit);
-        acc += atoi(lit);
+        printf("%i%i\n", first, second);
+        acc += first * 10 + second;
     }
 
     printf("\n%i\n", acc);
