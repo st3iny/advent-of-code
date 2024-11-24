@@ -11,16 +11,24 @@ fn main() {
     };
     let solution = match std::env::args().nth(1).unwrap().deref() {
         "part1" => part1(&input()),
-        "part2" => todo!(),
+        "part2" => part2(&input()),
         _ => panic!("Expected argument part1 or part2"),
     };
     print!("{solution}");
 }
 
 #[derive(Debug, PartialEq)]
-struct Galaxy(usize, usize);
+struct Galaxy(u64, u64);
 
 fn part1(input: &str) -> String {
+    accumulate_shortest_paths(input, 2)
+}
+
+fn part2(input: &str) -> String {
+    accumulate_shortest_paths(input, 1000000)
+}
+
+fn accumulate_shortest_paths(input: &str, expansion_factor: u64) -> String {
     // Expand rows and colums
     let line_length = input.lines().next().unwrap().len();
     let mut expanded_rows = Vec::new();
@@ -38,7 +46,7 @@ fn part1(input: &str) -> String {
 
         for (col, c) in line.chars().enumerate() {
             if c == '#' {
-                expanded_cols.retain(|col2| *col2 != col);
+                expanded_cols.retain(|&col2| col2 != col);
             }
         }
     }
@@ -48,15 +56,17 @@ fn part1(input: &str) -> String {
     for (row, line) in input.lines().enumerate() {
         for (col, c) in line.chars().enumerate() {
             if c == '#' {
-                let row = row + expanded_rows.iter().filter(|&&row2| row2 < row).count();
-                let col = col + expanded_cols.iter().filter(|&&col2| col2 < col).count();
+                let rows_to_add = expanded_rows.iter().filter(|&&row2| row2 < row).count() as u64;
+                let cols_to_add = expanded_cols.iter().filter(|&&col2| col2 < col).count() as u64;
+                let row = (row as u64) + rows_to_add * (expansion_factor - 1);
+                let col = (col as u64) + cols_to_add * (expansion_factor - 1);
                 galaxies.push(Galaxy(row, col));
             }
         }
     }
 
     // Calculate shortes paths
-    let mut acc = 0usize;
+    let mut acc = 0;
 
     for (i, galaxy) in galaxies.iter().enumerate() {
         for other_galaxy in galaxies.iter().skip(i + 1) {
@@ -74,9 +84,15 @@ fn part1(input: &str) -> String {
 mod tests {
     use super::*;
 
+    static INPUT: &str = include_str!("../input.txt");
+
     #[test]
     fn test_part1() {
-        let input = include_str!("../input.txt");
-        assert_eq!(part1(input), "9521776");
+        assert_eq!(part1(INPUT), "9521776");
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(INPUT), "553224415344");
     }
 }
