@@ -5,20 +5,27 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 make || exit 1
+cargo build || exit 1
 
 for day in day*; do
     [ ! -f "$day"/input.txt ] && continue
 
-    for part in "$day"/part*.c; do
-        exe="${part%.c}"
-        solution="$exe".solution.txt
+    for solution in "$day"/part*.solution.txt; do
+        test="${solution%.solution.txt}"
 
-        [ ! -f "$solution" ] && continue
-
-        if cmp -s "$solution" <("$exe" < "$day"/input.txt | tail -1); then
-            printf "%s\t${GREEN}OK${RESET}\n" "$exe"
+        if [ -f "$(dirname "$solution")"/Cargo.toml ]; then
+            exe=./target/debug/"$(basename "$(dirname "$test")")"
+            args="$(basename "$test")"
         else
-            printf "%s\t${RED}FAIL${RESET}\n" "$exe"
+            exe="$test"
+            args=''
+        fi
+
+        # shellcheck disable=2086
+        if cmp -s "$solution" <("$exe" $args < "$day"/input.txt | tail -1); then
+            printf "%s\t${GREEN}OK${RESET}\n" "$test"
+        else
+            printf "%s\t${RED}FAIL${RESET}\n" "$test"
             failed=true
         fi
     done

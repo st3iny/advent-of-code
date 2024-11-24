@@ -14,7 +14,7 @@ fn main() {
         "part2" => part2(&input()),
         _ => panic!("Expected argument part1 or part2"),
     };
-    print!("{solution}");
+    println!("{solution}");
 }
 
 #[derive(Debug, PartialEq)]
@@ -88,11 +88,11 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(INPUT), "9521776");
+        assert_eq!(part1(INPUT), include_str!("../part1.solution.txt").trim());
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), "553224415344");
+        assert_eq!(part2(INPUT), include_str!("../part2.solution.txt").trim());
     }
 }
