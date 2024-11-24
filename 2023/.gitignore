@@ -2,3 +2,4 @@
 /day*/part*
 !/day*/part*.c
 !/day*/part*.solution.txt
+/target
