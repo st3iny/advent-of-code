@@ -5,7 +5,7 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 make || exit 1
-cargo build || exit 1
+cargo build --release || exit 1
 
 for day in day*; do
     [ ! -f "$day"/input.txt ] && continue
@@ -14,7 +14,7 @@ for day in day*; do
         test="${solution%.solution.txt}"
 
         if [ -f "$(dirname "$solution")"/Cargo.toml ]; then
-            exe=./target/debug/"$(basename "$(dirname "$test")")"
+            exe=./target/release/"$(basename "$(dirname "$test")")"
             args="$(basename "$test")"
         else
             exe="$test"
