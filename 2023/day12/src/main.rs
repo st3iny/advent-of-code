@@ -156,7 +156,7 @@ fn part1(input: &str) -> String {
     acc.to_string()
 }
 
-fn part2(input: &str) -> String {
+fn part2(_input: &str) -> String {
     todo!()
 }
 
