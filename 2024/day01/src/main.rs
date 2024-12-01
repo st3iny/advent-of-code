@@ -31,23 +31,17 @@ fn part1(input: &str) -> String {
 fn part2(input: &str) -> String {
     let (list1, list2) = parse_input(input);
 
-    let mut acc = 0;
-    for id1 in list1 {
-        let occurrences = list2.iter().filter(|&&id2| id2 == id1).count() as u32;
-        acc += id1 * occurrences;
-    }
-
-    acc.to_string()
+    list1
+        .into_iter()
+        .map(|id1| list2.iter().filter(|&&id2| id2 == id1).sum::<u32>())
+        .sum::<u32>()
+        .to_string()
 }
 
 fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
     let mut list1: Vec<u32> = Vec::new();
     let mut list2: Vec<u32> = Vec::new();
     for line in input.lines() {
-        if line.is_empty() {
-            continue;
-        }
-
         let (id1, id2) = line.split_once("   ").unwrap();
         list1.push(id1.parse().unwrap());
         list2.push(id2.parse().unwrap());
@@ -61,6 +55,7 @@ mod tests {
     use super::*;
 
     static INPUT: &str = include_str!("../input.txt");
+    static EXAMPLE_INPUT: &str = include_str!("../example-input.txt");
 
     #[test]
     fn test_part1() {
@@ -69,8 +64,7 @@ mod tests {
 
     #[test]
     fn test_part1_example() {
-        let input = include_str!("../example-input.txt");
-        assert_eq!(part1(input), "11");
+        assert_eq!(part1(EXAMPLE_INPUT), "11");
     }
 
     #[test]
@@ -80,7 +74,6 @@ mod tests {
 
     #[test]
     fn test_part2_example() {
-        let input = include_str!("../example-input.txt");
-        assert_eq!(part2(input), "31");
+        assert_eq!(part2(EXAMPLE_INPUT), "31");
     }
 }
