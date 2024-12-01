@@ -15,17 +15,7 @@ fn main() {
 }
 
 fn part1(input: &str) -> String {
-    let mut list1: Vec<u32> = Vec::new();
-    let mut list2: Vec<u32> = Vec::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            continue;
-        }
-
-        let (id1, id2) = line.split_once("   ").unwrap();
-        list1.push(id1.parse().unwrap());
-        list2.push(id2.parse().unwrap());
-    }
+    let (mut list1, mut list2) = parse_input(input);
 
     list1.sort();
     list2.sort();
@@ -39,7 +29,31 @@ fn part1(input: &str) -> String {
 }
 
 fn part2(input: &str) -> String {
-    todo!()
+    let (list1, list2) = parse_input(input);
+
+    let mut acc = 0;
+    for id1 in list1 {
+        let occurrences = list2.iter().filter(|&&id2| id2 == id1).count() as u32;
+        acc += id1 * occurrences;
+    }
+
+    acc.to_string()
+}
+
+fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
+    let mut list1: Vec<u32> = Vec::new();
+    let mut list2: Vec<u32> = Vec::new();
+    for line in input.lines() {
+        if line.is_empty() {
+            continue;
+        }
+
+        let (id1, id2) = line.split_once("   ").unwrap();
+        list1.push(id1.parse().unwrap());
+        list2.push(id2.parse().unwrap());
+    }
+
+    (list1, list2)
 }
 
 #[cfg(test)]
@@ -55,12 +69,18 @@ mod tests {
 
     #[test]
     fn test_part1_example() {
-        let input = include_str!("../part1-example-input.txt");
+        let input = include_str!("../example-input.txt");
         assert_eq!(part1(input), "11");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), "0");
+        assert_eq!(part2(INPUT), "21271939");
+    }
+
+    #[test]
+    fn test_part2_example() {
+        let input = include_str!("../example-input.txt");
+        assert_eq!(part2(input), "31");
     }
 }
