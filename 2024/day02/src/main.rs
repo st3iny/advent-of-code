@@ -39,7 +39,34 @@ fn part1(input: &str) -> u16 {
 }
 
 fn part2(input: &str) -> u16 {
-    todo!()
+    parse_input(input)
+        .filter(|report| {
+            'outer: for i in 0..report.len() {
+                let mut report = report.clone();
+                report.remove(i);
+
+                let mut last = *report.first().unwrap();
+                let mut decreased = None;
+
+                for &level in report.iter().skip(1) {
+                    let decreased = *decreased.get_or_insert(level < last);
+                    if level == last
+                        || (decreased && level > last)
+                        || (!decreased && level < last)
+                        || level.abs_diff(last) > 3
+                    {
+                        continue 'outer;
+                    }
+
+                    last = level;
+                }
+
+                return true;
+            }
+
+            false
+        })
+        .count() as u16
 }
 
 fn parse_input(input: &str) -> impl Iterator<Item = Vec<u16>> {
@@ -68,15 +95,13 @@ mod tests {
         assert_eq!(part1(EXAMPLE_INPUT), 2);
     }
 
-    /*
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 0);
+        assert_eq!(part2(INPUT), 426);
     }
 
     #[test]
     fn test_part2_example() {
-        assert_eq!(part2(EXAMPLE_INPUT), 31);
+        assert_eq!(part2(EXAMPLE_INPUT), 4);
     }
-    */
 }
