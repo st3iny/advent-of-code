@@ -17,10 +17,11 @@ fn main() {
 fn part1(input: &str) -> u16 {
     parse_input(input)
         .filter(|report| {
-            let mut last = *report.first().unwrap();
+            let (last, report) = report.split_first().unwrap();
+            let mut last = *last;
             let mut decreased = None;
 
-            for &level in report.iter().skip(1) {
+            for &level in report {
                 let decreased = *decreased.get_or_insert(level < last);
                 if level == last
                     || (decreased && level > last)
@@ -45,10 +46,10 @@ fn part2(input: &str) -> u16 {
                 let mut report = report.clone();
                 report.remove(i);
 
-                let mut last = *report.first().unwrap();
+                let mut last = report.remove(0);
                 let mut decreased = None;
 
-                for &level in report.iter().skip(1) {
+                for level in report {
                     let decreased = *decreased.get_or_insert(level < last);
                     if level == last
                         || (decreased && level > last)
