@@ -17,7 +17,8 @@ fn main() {
 }
 
 fn part1(input: &str) -> u32 {
-    let regex = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
+    let regex = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").expect("Valid regex");
+
     input
         .lines()
         .flat_map(|program| {
@@ -31,7 +32,29 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    todo!()
+    let regex = Regex::new(r"(mul\(([0-9]+),([0-9]+)\)|do\(\)|don't\(\))").expect("Valid regex");
+
+    let mut acc = 0;
+    let mut enabled = true;
+    for program in input.lines() {
+        for capture in regex.captures_iter(program) {
+            match capture.get(0).unwrap().as_str() {
+                "do()" => enabled = true,
+                "don't()" => enabled = false,
+                _ => {
+                    if !enabled {
+                        continue;
+                    }
+
+                    let x: u32 = capture.get(2).unwrap().as_str().parse().unwrap();
+                    let y: u32 = capture.get(3).unwrap().as_str().parse().unwrap();
+                    acc += x * y
+                }
+            }
+        }
+    }
+
+    acc
 }
 
 #[cfg(test)]
@@ -53,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 426);
+        assert_eq!(part2(INPUT), 90669332);
     }
 
     #[test]
