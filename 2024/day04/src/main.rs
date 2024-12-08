@@ -21,10 +21,7 @@ fn main() {
 }
 
 fn part1(input: &str) -> u32 {
-    let grid = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
+    let grid = parse_input(input);
 
     let width = grid.first().unwrap().len();
     let height = grid.len();
@@ -132,7 +129,72 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    todo!()
+    let grid = parse_input(input);
+
+    let width = grid.first().unwrap().len();
+    let height = grid.len();
+
+    // To debug found candidates
+    let mut positions = Vec::new();
+
+    let mut acc = 0;
+
+    'row: for y in 0..height {
+        'col: for x in 0..width {
+            let mut position_stack = Vec::new();
+            let mut candidate = String::new();
+
+            if x + 2 >= width {
+                break 'col;
+            }
+
+            if y + 2 >= height {
+                break 'row;
+            }
+
+            let mut get = |x: usize, y: usize| {
+                let c = grid[y][x];
+                position_stack.push((x, y, c));
+                c
+            };
+
+            let tl = get(x, y);
+            let tr = get(x + 2, y);
+            let br = get(x + 2, y + 2);
+            let bl = get(x, y + 2);
+            let m = get(x + 1, y + 1);
+
+            if m == 'A'
+                && ((tl == 'M' && br == 'S') || (tl == 'S' && br == 'M'))
+                && ((tr == 'M' && bl == 'S') || (tr == 'S' && bl == 'M'))
+            {
+                acc += 1;
+                positions.extend_from_slice(&position_stack);
+            }
+        }
+    }
+
+    // Print grid with found candidates
+    let mut grid_out = Vec::new();
+    for _ in 0..height {
+        grid_out.push(repeat('.').take(width).collect::<Vec<_>>());
+    }
+    for (x, y, c) in positions {
+        grid_out[y][x] = c;
+    }
+
+    for y in 0..height {
+        for x in 0..width {
+            eprint!("{}", grid_out[y][x]);
+        }
+        eprintln!()
+    }
+
+    acc
+}
+
+fn parse_input(input: &str) -> Vec<Vec<char>> {
+    input.lines().map(|line| line.chars().collect()).collect()
 }
 
 #[cfg(test)]
@@ -152,15 +214,13 @@ mod tests {
         assert_eq!(part1(EXAMPLE_INPUT), 18);
     }
 
-    /*
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 90669332);
+        assert_eq!(part2(INPUT), 1815);
     }
 
     #[test]
     fn test_part2_example() {
-        assert_eq!(part2(EXAMPLE_INPUT), 48);
+        assert_eq!(part2(EXAMPLE_INPUT), 9);
     }
-    */
 }
