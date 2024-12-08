@@ -1,7 +1,4 @@
-use std::{
-    io::{Read, stdin},
-    iter::repeat,
-};
+use std::io::{Read, stdin};
 
 static XMAS: &str = "XMAS";
 static SAMX: &str = "SAMX";
@@ -26,9 +23,6 @@ fn part1(input: &str) -> u32 {
     let width = grid.first().unwrap().len();
     let height = grid.len();
 
-    // To debug found candidates
-    let mut positions = Vec::new();
-
     let mut acc = 0;
 
     // Horizontal
@@ -37,7 +31,6 @@ fn part1(input: &str) -> u32 {
             let candidate: String = grid[y][x..(x + XMAS.len())].iter().collect();
             if candidate == XMAS || candidate == SAMX {
                 acc += 1;
-                positions.extend((x..(x + XMAS.len())).map(|x| (x, y, grid[y][x])));
             }
         }
     }
@@ -45,16 +38,12 @@ fn part1(input: &str) -> u32 {
     // Vertical
     for x in 0..width {
         for y in 0..=(height - XMAS.len()) {
-            let mut position_stack = Vec::new();
             let mut candidate = String::new();
             for i in 0..XMAS.len() {
-                let c = grid[y + i][x];
-                candidate.push(c);
-                position_stack.push((x, y + i, c));
+                candidate.push(grid[y + i][x]);
             }
             if candidate == XMAS || candidate == SAMX {
                 acc += 1;
-                positions.extend_from_slice(&position_stack);
             }
         }
     }
@@ -62,7 +51,6 @@ fn part1(input: &str) -> u32 {
     // Diagonal (top left to bottom right)
     'row: for y in 0..height {
         'col: for x in 0..width {
-            let mut position_stack = Vec::new();
             let mut candidate = String::new();
             for i in 0..XMAS.len() {
                 if x + i >= width {
@@ -73,13 +61,10 @@ fn part1(input: &str) -> u32 {
                     break 'row;
                 }
 
-                let c = grid[y + i][x + i];
-                candidate.push(c);
-                position_stack.push((x + i, y + i, c));
+                candidate.push(grid[y + i][x + i]);
             }
             if candidate == XMAS || candidate == SAMX {
                 acc += 1;
-                positions.extend_from_slice(&position_stack);
             }
         }
     }
@@ -87,7 +72,6 @@ fn part1(input: &str) -> u32 {
     // Diagonal (top right to bottom left)
     'row: for y in 0..height {
         'col: for x in (0..width).rev() {
-            let mut position_stack = Vec::new();
             let mut candidate = String::new();
             for i in 0..XMAS.len() {
                 if i > x {
@@ -98,31 +82,12 @@ fn part1(input: &str) -> u32 {
                     break 'row;
                 }
 
-                let c = grid[y + i][x - i];
-                candidate.push(c);
-                position_stack.push((x - i, y + i, c));
+                candidate.push(grid[y + i][x - i]);
             }
             if candidate == XMAS || candidate == SAMX {
                 acc += 1;
-                positions.extend_from_slice(&position_stack);
             }
         }
-    }
-
-    // Print grid with found candidates
-    let mut grid_out = Vec::new();
-    for _ in 0..height {
-        grid_out.push(repeat('.').take(width).collect::<Vec<_>>());
-    }
-    for (x, y, c) in positions {
-        grid_out[y][x] = c;
-    }
-
-    for y in 0..height {
-        for x in 0..width {
-            eprint!("{}", grid_out[y][x]);
-        }
-        eprintln!()
     }
 
     acc
@@ -134,16 +99,9 @@ fn part2(input: &str) -> u32 {
     let width = grid.first().unwrap().len();
     let height = grid.len();
 
-    // To debug found candidates
-    let mut positions = Vec::new();
-
     let mut acc = 0;
-
     'row: for y in 0..height {
         'col: for x in 0..width {
-            let mut position_stack = Vec::new();
-            let mut candidate = String::new();
-
             if x + 2 >= width {
                 break 'col;
             }
@@ -152,42 +110,19 @@ fn part2(input: &str) -> u32 {
                 break 'row;
             }
 
-            let mut get = |x: usize, y: usize| {
-                let c = grid[y][x];
-                position_stack.push((x, y, c));
-                c
-            };
-
-            let tl = get(x, y);
-            let tr = get(x + 2, y);
-            let br = get(x + 2, y + 2);
-            let bl = get(x, y + 2);
-            let m = get(x + 1, y + 1);
+            let tl = grid[x][y];
+            let tr = grid[x + 2][y];
+            let br = grid[x + 2][y + 2];
+            let bl = grid[x][y + 2];
+            let m = grid[x + 1][y + 1];
 
             if m == 'A'
                 && ((tl == 'M' && br == 'S') || (tl == 'S' && br == 'M'))
                 && ((tr == 'M' && bl == 'S') || (tr == 'S' && bl == 'M'))
             {
                 acc += 1;
-                positions.extend_from_slice(&position_stack);
             }
         }
-    }
-
-    // Print grid with found candidates
-    let mut grid_out = Vec::new();
-    for _ in 0..height {
-        grid_out.push(repeat('.').take(width).collect::<Vec<_>>());
-    }
-    for (x, y, c) in positions {
-        grid_out[y][x] = c;
-    }
-
-    for y in 0..height {
-        for x in 0..width {
-            eprint!("{}", grid_out[y][x]);
-        }
-        eprintln!()
     }
 
     acc
