@@ -18,21 +18,24 @@ fn main() {
 }
 
 fn part1(input: &str) -> usize {
-    let (map, mut guard) = parse_input(input);
+    let (map, guard) = parse_input(input);
+    trace_steps(&map, guard).len()
+}
 
+fn trace_steps(map: &Map, mut guard: Guard) -> HashSet<(Coordinate, Coordinate)> {
     let mut steps = HashSet::new();
     loop {
         let (dx, dy) = guard.direction.delta();
+        let new_x = guard.x + dx;
+        let new_y = guard.y + dy;
 
-        guard.x += dx;
-        guard.y += dy;
-
-        if map.obstacle_at(guard.x, guard.y) {
-            guard.x -= dx;
-            guard.y -= dy;
+        if map.obstacles.contains(&(new_x, new_y)) {
             guard.direction.rotate_clockwise_90_deg();
             continue;
         }
+
+        guard.x = new_x;
+        guard.y = new_y;
 
         if guard.x < 0 || guard.x >= map.right || guard.y < 0 || guard.y >= map.bottom {
             break;
@@ -41,24 +44,22 @@ fn part1(input: &str) -> usize {
         steps.insert((guard.x, guard.y));
     }
 
-    steps.len()
+    steps
 }
 
 fn part2(input: &str) -> usize {
     let (map, guard) = parse_input(input);
 
     let mut acc = 0;
-    for y in 0..map.bottom {
-        for x in 0..map.right {
-            if guard.x == x && guard.y == y || map.obstacle_at(x, y) {
-                continue;
-            }
+    for (x, y) in trace_steps(&map, guard.clone()) {
+        if guard.x == x && guard.y == y {
+            continue;
+        }
 
-            let mut map = map.clone();
-            map.obstacles.insert((x, y));
-            if find_loop(map, guard.clone()) {
-                acc += 1;
-            }
+        let mut map = map.clone();
+        map.obstacles.insert((x, y));
+        if find_loop(map, guard.clone()) {
+            acc += 1;
         }
     }
 
@@ -69,16 +70,16 @@ fn find_loop(map: Map, mut guard: Guard) -> bool {
     let mut steps = HashSet::new();
     loop {
         let (dx, dy) = guard.direction.delta();
+        let new_x = guard.x + dx;
+        let new_y = guard.y + dy;
 
-        guard.x += dx;
-        guard.y += dy;
-
-        if map.obstacle_at(guard.x, guard.y) {
-            guard.x -= dx;
-            guard.y -= dy;
+        if map.obstacles.contains(&(new_x, new_y)) {
             guard.direction.rotate_clockwise_90_deg();
             continue;
         }
+
+        guard.x = new_x;
+        guard.y = new_y;
 
         if guard.x < 0 || guard.x >= map.right || guard.y < 0 || guard.y >= map.bottom {
             break;
@@ -99,12 +100,6 @@ struct Map {
     obstacles: HashSet<(Coordinate, Coordinate)>,
     right: Coordinate,
     bottom: Coordinate,
-}
-
-impl Map {
-    fn obstacle_at(&self, x: Coordinate, y: Coordinate) -> bool {
-        self.obstacles.contains(&(x, y))
-    }
 }
 
 #[derive(Clone)]
