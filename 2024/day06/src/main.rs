@@ -44,13 +44,57 @@ fn part1(input: &str) -> usize {
     steps.len()
 }
 
-fn part2(_input: &str) -> usize {
-    todo!()
+fn part2(input: &str) -> usize {
+    let (map, guard) = parse_input(input);
+
+    let mut acc = 0;
+    for y in 0..map.bottom {
+        for x in 0..map.right {
+            if guard.x == x && guard.y == y || map.obstacle_at(x, y) {
+                continue;
+            }
+
+            let mut map = map.clone();
+            map.obstacles.insert((x, y));
+            if find_loop(map, guard.clone()) {
+                acc += 1;
+            }
+        }
+    }
+
+    acc
+}
+
+fn find_loop(map: Map, mut guard: Guard) -> bool {
+    let mut steps = HashSet::new();
+    loop {
+        let (dx, dy) = guard.direction.delta();
+
+        guard.x += dx;
+        guard.y += dy;
+
+        if map.obstacle_at(guard.x, guard.y) {
+            guard.x -= dx;
+            guard.y -= dy;
+            guard.direction.rotate_clockwise_90_deg();
+            continue;
+        }
+
+        if guard.x < 0 || guard.x >= map.right || guard.y < 0 || guard.y >= map.bottom {
+            break;
+        }
+
+        if !steps.insert((guard.x, guard.y, guard.direction.clone())) {
+            return true;
+        }
+    }
+
+    false
 }
 
 type Coordinate = i16;
 
-#[derive(Debug)]
+#[derive(Clone)]
 struct Map {
     obstacles: HashSet<(Coordinate, Coordinate)>,
     right: Coordinate,
@@ -63,14 +107,14 @@ impl Map {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone)]
 struct Guard {
     x: Coordinate,
     y: Coordinate,
     direction: Direction,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Hash, Eq, PartialEq)]
 enum Direction {
     Up,
     Left,
@@ -162,15 +206,13 @@ mod tests {
         assert_eq!(part1(EXAMPLE_INPUT), 41);
     }
 
-    /*
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 1815);
+        assert_eq!(part2(INPUT), 1793);
     }
 
     #[test]
     fn test_part2_example() {
-        assert_eq!(part2(EXAMPLE_INPUT), 9);
+        assert_eq!(part2(EXAMPLE_INPUT), 6);
     }
-    */
 }
