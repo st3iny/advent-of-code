@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    io::{stdin, Read},
-};
+use std::io::{stdin, Read};
 
 fn main() {
     let input = || {
@@ -18,31 +15,63 @@ fn main() {
 }
 
 fn part1(input: &str) -> u64 {
-    let mut valid = HashSet::new();
-    for line in input.lines() {
-        let (sum, operands) = line.split_once(": ").unwrap();
-        let sum: u64 = sum.parse().unwrap();
-        let operands: Vec<u64> = operands.split(' ').map(|op| op.parse().unwrap()).collect();
-        backtrack(0, &operands, sum, &mut valid);
-    }
-
-    valid.into_iter().sum()
+    input
+        .lines()
+        .filter_map(|line| {
+            let (sum, operands) = parse_line(line);
+            match backtrack(0, &operands, sum, false) {
+                true => Some(sum),
+                false => None,
+            }
+        })
+        .sum()
 }
 
-fn backtrack(current: u64, tail: &[u64], target: u64, results: &mut HashSet<u64>) {
+fn part2(input: &str) -> u64 {
+    input
+        .lines()
+        .filter_map(|line| {
+            let (sum, operands) = parse_line(line);
+            match backtrack(0, &operands, sum, true) {
+                true => Some(sum),
+                false => None,
+            }
+        })
+        .sum()
+}
+
+fn backtrack(current: u64, tail: &[u64], target: u64, combine_op: bool) -> bool {
     let Some((head, tail)) = tail.split_first() else {
-        if current == target {
-            results.insert(current);
-        }
-        return;
+        return current == target;
     };
 
-    backtrack(current + head, tail, target, results);
-    backtrack(current * head, tail, target, results);
+    if backtrack(current + head, tail, target, combine_op) {
+        return true;
+    }
+
+    if backtrack(current * head, tail, target, combine_op) {
+        return true;
+    }
+
+    if combine_op
+        && backtrack(
+            format!("{current}{head}").parse().unwrap(),
+            tail,
+            target,
+            combine_op,
+        )
+    {
+        return true;
+    }
+
+    false
 }
 
-fn part2(_input: &str) -> u64 {
-    todo!()
+fn parse_line(line: &str) -> (u64, Vec<u64>) {
+    let (sum, operands) = line.split_once(": ").unwrap();
+    let sum: u64 = sum.parse().unwrap();
+    let operands: Vec<u64> = operands.split(' ').map(|op| op.parse().unwrap()).collect();
+    (sum, operands)
 }
 
 #[cfg(test)]
@@ -62,15 +91,13 @@ mod tests {
         assert_eq!(part1(EXAMPLE_INPUT), 3749);
     }
 
-    /*
     #[test]
     fn test_part2() {
-        assert_eq!(part2(INPUT), 1793);
+        assert_eq!(part2(INPUT), 44841372855953);
     }
 
     #[test]
     fn test_part2_example() {
-        assert_eq!(part2(EXAMPLE_INPUT), 6);
+        assert_eq!(part2(EXAMPLE_INPUT), 11387);
     }
-    */
 }
