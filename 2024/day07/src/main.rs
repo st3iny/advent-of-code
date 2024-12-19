@@ -55,7 +55,7 @@ fn backtrack(current: u64, tail: &[u64], target: u64, combine_op: bool) -> bool 
 
     if combine_op
         && backtrack(
-            format!("{current}{head}").parse().unwrap(),
+            current * 10u64.pow((*head as f32).log10() as u32 + 1) + head,
             tail,
             target,
             combine_op,
